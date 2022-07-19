@@ -5,8 +5,6 @@
 
 typedef struct
 {
-	//char* error;
-
 	void	     (*add)		 (const void *value);
 	void	     (*remove)   (const void *value);
 	/*void	     (*remove_at)(const size_t index);
@@ -19,4 +17,4 @@ typedef struct
 	const size_t (*count)    ();*/
 } list_t;
 
-list_t *new_list(size_t size);
+list_t *new_list();

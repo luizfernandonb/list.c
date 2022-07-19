@@ -2,118 +2,98 @@
 
 #include "list.h"
 
-#define DEFAULT_SIZE								 4
+#define DEFAULT_SIZE								 8
 #define VALUE_OR_DEFAULT(value, default_value)		 value ? value : default_value
-#define SIZE_OF_POINTER_TO_POINTER(array, type_size) (sizeof(array) * type_size)
 
-// Private methods
+/*
+ * =======================
+ * |    PRIVATE STUFF    |
+ * =======================
+ */
 
-typedef struct list_node_t
+typedef struct
 {
-	size_t			   value_size;
-	void			   *value;
+	void *value;
 
-	struct list_node_t *next;
-} list_node_t;
+	// Indicates that this memory is allocated to this struct, more precisely when this field is 0 (after using memset)
+	char *this_memory_is_allocated_by_other;
+} list_object_t;
 
-size_t      _count           = 0;
-size_t      _count_allocated = 0;
-list_t      *_current_list   = NULL;
-list_node_t *current_node    = NULL;
+list_t *current_list = NULL;
+list_object_t *objects = NULL;
 
-void set_node_default_value_size(list_node_t *nodes, size_t value_size, size_t node_count)
+const size_t get_count()
 {
-	for (size_t counter = 0; counter < node_count; counter++)
+	list_object_t *objs = objects;
+
+	size_t counter = 0;
+
+	while (objs->this_memory_is_allocated_by_other == 0)
 	{
-		(nodes + counter)->value_size = value_size;
+		++objs;
+		++counter;
 	}
+
+	return counter;
 }
 
-void set_node_next_node(list_node_t *nodes, size_t node_count)
-{
-	for (size_t counter = 0; counter < node_count; counter++)
-	{
-		if (counter == 0)
-		{
-			continue;
-		}
-
-		list_node_t *actual_node = nodes + counter;
-		list_node_t *previous_node = actual_node - 1;
-
-		previous_node->next = actual_node;
-	}
-}
-
-// Public methods
+/*
+ * ======================
+ * |	PUBLIC STUFF    |
+ * ======================
+ */
 
 void add(const void *value)
 {
-	if (_count == 0) // First value
-	{
-		current_node->value = value;
-	}
-	else
-	{
-		if (_count < _count_allocated) // Free space
-		{
-			(current_node + _count)->value = value;
-		}
-		else // Not free space, realloc list
-		{
-			_count_allocated = _count_allocated + 4; // Why 4? IDK
-			list_node_t *new_nodes = realloc(current_node, sizeof(list_node_t) * _count_allocated);
-			set_node_default_value_size(new_nodes, current_node->value_size, _count_allocated);
-			set_node_next_node(new_nodes, _count_allocated);
+	list_object_t *objs = objects;
 
-			current_node = new_nodes;
-		}
-	}
+	while (objs->this_memory_is_allocated_by_other == 0)
+	{
+		if (!objs->value)
+		{
+			objs->value = value;
 
-	++_count;
+			break;
+		}
+
+		++objs;
+	}
 }
 
 void remove(const void *value)
 {
-	for (size_t counter = 0; counter < _count_allocated; ++counter)
+	size_t counter = get_count() - 1; // You can only remove one element at a time
+	list_object_t *new_objs = calloc(counter, sizeof(list_object_t));
+
+	for (size_t i = 0; i < counter + 1; i++)
 	{
-		list_node_t *actual_node = current_node + counter;
-		if (actual_node->value == value)
+		list_object_t *old_obj = objects + i;
+		list_object_t *new_obj = new_objs + i;
+
+		if (new_obj->this_memory_is_allocated_by_other)
 		{
-			if (counter == 0)
-			{
-				// TODO
-			}
-			else
-			{
-				list_node_t *previous_node = actual_node - 1;
-				list_node_t *next_node     = actual_node + 1;
+			return;
+		}
 
-				previous_node->next = next_node;
-
-				free(actual_node);
-			}
+		if (old_obj->value != value)
+		{
+			new_obj->value = old_obj->value;
+		}
+		else
+		{
+			new_obj->value = (objects + i + 1)->value;
+			++i;
 		}
 	}
-
-	--_count;
 }
 
-list_t *new_list(size_t size)
+list_t *new_list()
 {	 
-	_current_list = malloc(sizeof(list_t));
-	if (_current_list)
-	{
-		_current_list->add	 = &add;
-		_current_list->remove = &remove;
+	list_t *list = calloc(DEFAULT_SIZE, sizeof(list_t));
+	list->add    = &add;
+	list->remove = &remove;
 
-		_count = 0;
-	}
+	objects = calloc(DEFAULT_SIZE, sizeof(list_object_t));
 
-	current_node = malloc(sizeof(list_node_t) * DEFAULT_SIZE);
-	set_node_default_value_size(current_node, size, DEFAULT_SIZE);
-	set_node_next_node(current_node, DEFAULT_SIZE);
-	_count_allocated = DEFAULT_SIZE;
-
-	return _current_list;
+	return current_list = list;
 }

@@ -14,8 +14,8 @@ int main()
 	l->add(60);
 	l->add(70);
 	l->add(80);
-	l->add(90);
-	l->add(100);
+	//l->add(90);
+	//l->add(100);
 
 	l->remove(60);
 
