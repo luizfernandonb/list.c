@@ -3,17 +3,19 @@
 
 #include "list.h"
 
-#define VALUE_OR_DEFAULT(value, default_value) value ? value : default_value
-#define NO_MEMORY_CHECK(allocated_object)      if (!allocated_object)              \
-										       {                                   \
-                                                   printf("No memory available."); \
-                                                                                   \
-                                                   system("pause");                \
-										       }                                   \
-
-#define THROW_ERROR(error)                     printf(error);                      \
-                                                                                   \
-                                               system("pause");                    \
+#define VALUE_OR_DEFAULT(value, default_value)  value ? value : default_value
+#define NO_MEMORY_CHECK(allocated_object)       if (!allocated_object)              \
+										        {                                   \
+                                                    printf("No memory available."); \
+                                                                                    \
+                                                    system("pause");                \
+										        }                                   \
+											    
+#define THROW_ERROR(error)                      printf(error);                      \
+                                                                                    \
+                                                system("pause");                    \
+											    
+#define FOREACH_LIST_OBJECT(counter_name)       for (list_object_t *counter_name = objects; counter_name->this_memory_space_is_allocated_by_other == NULL; counter_name++)
 
 /*
  * =======================
@@ -136,16 +138,12 @@ void remove_at(const size_t index)
 
 void remove_element(const void *value)
 {
-	list_object_t *local_object = objects;
-
-	for (size_t i = 0; i < get_index_counter(); i++)
+	FOREACH_LIST_OBJECT(local_objects)
 	{
-		if (local_object->value == value)
+		if (local_objects->value == value)
 		{
-			remove_at(i);
+			remove_at(local_objects - objects); // Difference = index
 		}
-
-		++local_object;
 	}
 }
 
@@ -160,6 +158,40 @@ void print()
 	printf("Count: %zu elements\n\n", i);
 }
 
+void clear()
+{
+	free(objects);
+}
+
+const bool exists(const void *value)
+{
+	FOREACH_LIST_OBJECT(local_objects)
+	{
+		if (local_objects->value == value)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+const size_t index_of(const void *value)
+{
+	FOREACH_LIST_OBJECT(local_objects)
+	{
+		if (local_objects->value == value)
+		{
+			return local_objects - objects;
+		}
+	}
+}
+
+const size_t count()
+{
+	return get_index_counter() + 1;
+}
+
 const list_t new_list()
 {	 
 	list_t list =
@@ -167,7 +199,12 @@ const list_t new_list()
 		.add            = add,
 		.remove_at      = remove_at,
 		.remove_element = remove_element,
-		.print          = print
+		.print          = print,
+		.clear          = clear,
+		.exists         = exists,
+		.index_of       = index_of,
+		//.reverse		= reverse,
+		.count			= count
 	};
 	
 	return current_list = list;

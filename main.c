@@ -25,4 +25,9 @@ int main()
 	l.remove_element(50);
 	
 	l.print();
+
+	l.clear();
+
+	l.print();
+
 }
