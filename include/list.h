@@ -15,6 +15,7 @@ typedef struct list_t
 	//const struct list_t (*reverse)       ();
 	//const struct list_t (*dereverse)     ();
 	const size_t        (*count)         ();
+	const void*			(*element_at)	 (const size_t index);
 } list_t;
 
 const struct list_t new_list();

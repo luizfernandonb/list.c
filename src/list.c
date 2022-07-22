@@ -192,6 +192,23 @@ const size_t count()
 	return get_index_counter() + 1;
 }
 
+const void *element_at(const size_t index)
+{
+	size_t counter = 0;
+
+	FOREACH_LIST_OBJECT(local_objects)
+	{
+		if (counter == index)
+		{
+			return local_objects->value;
+		}
+
+		++counter;
+	}
+
+	return NULL;
+}
+
 const list_t new_list()
 {	 
 	list_t list =
@@ -204,7 +221,8 @@ const list_t new_list()
 		.exists         = exists,
 		.index_of       = index_of,
 		//.reverse		= reverse,
-		.count			= count
+		.count			= count,
+		.element_at     = element_at
 	};
 	
 	return current_list = list;
