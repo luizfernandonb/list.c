@@ -1,7 +1,14 @@
 # list.c
 An implementation of a list in C, based on C#'s List&lt;T>.
 
-Documentation:
+## Compiling
+- In Windows
+    - Install Visual Studio (IDE) and open the project.
+
+- In Unix
+    - Coming soon.
+
+## Documentation
 - Create -> Create the `list_t`.
 ```C
  const list_t list = new_list();
