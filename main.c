@@ -4,8 +4,10 @@
 
 int main()
 {
-	list_t l = new_list(sizeof(int));
+	// Ignore C4022, C4311 warnings in MSVC
 
+	const list_t l = new_list();
+	
 	l.add(10);
 	l.add(20);
 	l.add(30);
@@ -22,6 +24,10 @@ int main()
 
 	l.print();
 
+	l.reverse();
+
+	l.print();
+
 	//l.remove_element(50);
 	
 	//l.print();
@@ -32,5 +38,7 @@ int main()
 
 	int elem = (int)l.element_at(3);
 
-	printf("%d", elem);
+	printf("%d\n", elem);
+
+	system("pause");
 }

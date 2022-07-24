@@ -2,53 +2,58 @@
 An implementation of a list in C, based on C#'s List&lt;T>.
 
 Documentation:
-- Create -> Create the list
+- Create -> Create the `list_t`.
 ```C
  const list_t list = new_list();
 ```
 
-- Add -> Add an element to the list
+- Add -> Adds an object to the end of the `list_t`.
 ```C
 list.add(const void* value);
 ```
 
 - Remove
-	- Remove element -> Remove an element
-	```C
-	list.remove_element(const void *value);
-	```
-
-	- Remove at -> Remove an element from the list from the index
+	- Remove at -> Removes the element at the specified index of the `list_t`.
 	```C
     list.remove_at(const size_t index);
 	```
 
-- Print -> Shows in the console all the elements of the list (if it is in a console)
-```C
-list.print();
-```
+	- Remove element -> Removes the first occurrence of a specific object from the `list_t`.
+	```C
+	list.remove_element(const void *value);
+	```
 
-- Clear -> Clear the list
+- Clear -> Removes all elements from the `list_t`.
 ```C
 list.clear();
 ```
 
-- Exists -> Checks if an element exists
+- Print -> Shows all elements in the `list_t` in the console.
 ```C
-const bool exists = list.exists();
+list.print();
 ```
 
-- Index Of -> Returns the index from the element
+- Reverse -> Reverses the order of the elements in the entire `list_t`.
+```C
+list.reverse();
+```
+
+- Exists -> Determines whether the `list_t` contains an element.
+```C
+const bool exists = list.exists(const void *value);
+```
+
+- Index Of -> Searches for the specified object and returns the zero-based index of the first occurrence within the entire `list_t`.
 ```C
 const size_t index = list.index_of(const void *value);
 ```
 
-- Count -> Returns the number of elements in the list
+- Count -> Gets the number of elements contained in the `list_t`.
 ```C
 const size_t count = list.count();
 ```
 
-- Element At -> Returns the element of a list from index
+- Element At -> Returns the element at a specified index in a sequence.
 ```C
 const void* elem = list.element_at(const size_t index);
 ```
