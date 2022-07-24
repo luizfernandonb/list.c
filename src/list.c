@@ -2,16 +2,17 @@
 #include <string.h>
 
 #include "list.h"
-									    
-#define FOREACH_LIST_OBJECT(counter_name, list_objects) for (list_object_t *counter_name = list_objects; counter_name->this_memory_space_is_allocated_by_other == NULL; ++counter_name)
 
-#if defined(__GNUC__) || defined(__clang__)
-#define INLINE __attribute__((always_inline))
-#else
-#define INLINE __forceinline
-#endif
 
 // PRIVATE STUFF
+
+#define FOREACH_LIST_OBJECT(counter_name, list_objects) for (list_object_t *counter_name = list_objects; counter_name->this_memory_space_is_allocated_by_other == NULL; ++counter_name)
+
+//#if defined(__GNUC__) || defined(__clang__)
+//#define INLINE __attribute__((always_inline)) inline
+//#else
+#define INLINE __forceinline
+//#endif
 
 typedef struct
 {
@@ -26,7 +27,7 @@ list_object_t *objects     = NULL;
 
 INLINE void throw_error(const char *message)
 {
-	printf(message);
+	printf("%s", message);
 
 	while (true);
 }
@@ -39,15 +40,15 @@ INLINE void throw_if_null(const void *object, const char* message)
 	}
 }
 
-INLINE void check_list_in_memory()
+INLINE void check_list_in_memory(void)
 {
-	throw_if_null(current_list.add, "Call the new_list method to create the list_t in memory.");
+	throw_if_null((void*)current_list.add, "Call the new_list method to create the list_t in memory.");
 	throw_if_null(objects, "Call the new_list method to create the list_t in memory.");
 }
 
 INLINE void memcpy_list_object(const list_object_t *destination, const list_object_t *source)
 {
-	memcpy((const void*)destination, (const void*)source, sizeof(list_object_t));
+	memcpy((void*)destination, (void*)source, sizeof(list_object_t));
 }
 
 INLINE void check_index_out_of_limit(const size_t index)
@@ -66,13 +67,13 @@ INLINE list_object_t *malloc_list_object(const size_t count)
 	return object;
 }
 
-INLINE size_t get_count_of_objects_to_allocate_in_add()
+INLINE size_t get_count_of_objects_to_allocate_in_add(void)
 {
 	// One more element is always added
 	return current_list.count() + 1;
 }
 
-INLINE size_t get_count_of_objects_to_allocate_in_remove()
+INLINE size_t get_count_of_objects_to_allocate_in_remove(void)
 {
 	// One more element is always removed
 	return current_list.count() - 1;
@@ -111,7 +112,7 @@ void add(const void *value)
 		 * Pointers always start with the index 0, so if we decrease the last_index, we get the last empty object this pointer
 		 * know it's confusing, but this was the only way I found it viable
 		 */
-		get_count()))->value = value;
+		get_count()))->value = (void*)value;
 
 	free(objects);
 
@@ -127,7 +128,7 @@ void remove_at(const size_t index)
 
 	list_object_t *new_objects = malloc_list_object(get_count_of_objects_to_allocate_in_remove());
 
-	for (size_t i = 0; i < get_count(); i++)
+	for (size_t i = 0; i < get_count(); ++i)
 	{
 		if (i >= index)
 		{
@@ -221,7 +222,7 @@ const bool exists(const void *value)
 	return false;
 }
 
-const size_t index_of(const void *value)
+const long long index_of(const void *value)
 {
 	check_list_in_memory();
 
