@@ -3,10 +3,7 @@ An implementation of a list in C, based on C#'s List&lt;T>.
 
 ## Compiling
 - In Windows
-    - Install Visual Studio (IDE) and open the project.
-
-- In Unix
-    - Coming soon.
+    - Install Visual Studio (IDE) with "Development with C++" workload, open the project and compile using `Ctrl` + `Shift` + `B`.
 
 ## Documentation
 - Create -> Create the `list_t`.
